@@ -10,31 +10,71 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         try{
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5433/ovchipkaart", "postgres", "H0meW0rk");
+            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
             ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn);
-
-//            ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn);
-//            List<Reiziger> reizigers = reizigerDAOPsql.findAll();
-//            System.out.println("Alle reizigers: " + reizigers);
-
-
-            String gbdatum = "1981-03-14";
-            Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
-            reizigerDAOPsql.save(sietske);
-            List<Reiziger> reizigersId = reizigerDAOPsql.findAll();
-            System.out.println(reizigersId);
-
-//            Statement myStmt = myConn.createStatement();
-//
-//            ResultSet myRs = myStmt.executeQuery("SELECT * FROM reiziger");
-//
-//            while (myRs.next()){
-//                System.out.println(myRs.getString(1) + ", "+ myRs.getString(2) + ", "+ myRs.getString(3) + ", "+ myRs.getString(4) + ", "+ myRs.getString(5));
-//            }
+            testReizigerDAO(reizigerDAOPsql);
 
         }catch (Exception exp){
             exp.printStackTrace();
         }
+
+    }
+
+    /**
+     * P2. Reiziger DAO: persistentie van een klasse
+     *
+     * Deze methode test de CRUD-functionaliteit van de Reiziger DAO
+     *
+     * @throws SQLException
+     */
+    private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
+        System.out.println("\n---------- Test ReizigerDAO -------------");
+
+        // Haal alle reizigers op uit de database
+        List<Reiziger> reizigers = rdao.findAll();
+        System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
+        for (Reiziger r : reizigers) {
+            System.out.println(r);
+        }
+        System.out.println();
+
+        // Maak een nieuwe reiziger aan en persisteer deze in de database
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
+        System.out.print("[Test] Eerst " + reizigers.size() + " reizigers, na ReizigerDAO.save() ");
+        rdao.save(sietske);
+        reizigers = rdao.findAll();
+        System.out.println(reizigers.size() + " reizigers\n");
+
+        // Test de update-functionaliteit
+        System.out.println("[Test] Update de naam van de reiziger met id 77.");
+        sietske.setAchternaam("Bakker");
+        rdao.update(sietske);
+        Reiziger updatedSietske = rdao.findBy(77);
+        System.out.println("Reiziger met id 77 na update: " + updatedSietske + "\n");
+
+        // Test de findByGbdatum-functionaliteit
+        System.out.println("[Test] Vind de geboortedatum van de reiziger met geb "+ gbdatum);
+        List<Reiziger> reizigersMetGeb = rdao.findByGbdatum(java.sql.Date.valueOf(gbdatum));
+        System.out.println("Reizigers met deze geboortedatum:");
+        for (Reiziger r : reizigersMetGeb){
+            System.out.println(r);
+        }
+        System.out.println();
+
+        // Test de delete-functionaliteit
+        System.out.println("[Test] Verwijder de reiziger met id 77.");
+        rdao.delete(sietske);
+        reizigers = rdao.findAll();
+        System.out.println("Aantal reizigers na ReizigerDAO.delete(): " + reizigers.size());
+        System.out.println("[Test] Reiziger met id 77 zou verwijderd moeten zijn.");
+        Reiziger deletedSietske = rdao.findBy(77);
+        if (deletedSietske == null) {
+            System.out.println("Reiziger met id 77 is succesvol verwijderd.\n");
+        } else {
+            System.out.println("Er is iets misgegaan, reiziger met id 77 bestaat nog steeds: " + deletedSietske + "\n");
+        }
+
 
     }
 

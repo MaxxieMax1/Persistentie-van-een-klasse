@@ -62,11 +62,11 @@ public class Reiziger {
     @Override
     public String toString() {
         return "["+
-                id + " - " +
+                id + " -" +
                 " " + voorletters +
                 " " + tussenvoegsel +
                 " " + achternaam +
-                " " + " - " + datum + "]"
+                " " + "- " + datum + "]"
                 ;
     }
 }
