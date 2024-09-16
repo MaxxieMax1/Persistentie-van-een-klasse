@@ -1,5 +1,6 @@
 package nl.hu.dp.MOD;
 import java.sql.Date;
+import java.util.List;
 
 public class Reiziger {
     private int id;
@@ -7,6 +8,8 @@ public class Reiziger {
     private String tussenvoegsel;
     private String achternaam;
     private Date datum;
+
+    private Adres adres;
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date datum) {
         this.id = id;
@@ -56,7 +59,11 @@ public class Reiziger {
         this.datum = datum;
     }
 
-//    public String getNaam(){
+    public Adres getAdres() {
+        return adres;
+    }
+
+    //    public String getNaam(){
 //    }
 
     @Override

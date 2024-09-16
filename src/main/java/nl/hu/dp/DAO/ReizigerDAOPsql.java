@@ -12,6 +12,9 @@ public class ReizigerDAOPsql implements ReizigerDAO{
     public ReizigerDAOPsql(Connection conn) {
         this.conn = conn;
     }
+    AdresDAO adresDAO;
+
+
     @Override
     public boolean save(Reiziger reiziger) {
         String query = "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) VALUES (?, ?, ?, ?, ?)";
@@ -25,6 +28,11 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ps.setDate(5, reiziger.getDatum());
 
             int rowsAffected = ps.executeUpdate();
+
+            if (this.adresDAO != null) {
+                this.adresDAO.save(reiziger.getAdres());
+            }
+
             return rowsAffected > 0;
         }catch (SQLException e){
             e.printStackTrace();
@@ -43,6 +51,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ps.setDate(4, reiziger.getDatum());
             ps.setInt(5, reiziger.getId());
             int rowsAffected = ps.executeUpdate();
+
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();

@@ -1,9 +1,11 @@
 package nl.hu.dp.DAO;
 
 import nl.hu.dp.MOD.Adres;
+import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -33,22 +35,73 @@ public class AdresDAOPsql  implements AdresDAO{
 
         statement.executeUpdate();
         statement.close();
+
         return true;
     }
 
     @Override
     public boolean update(Adres adres) {
-        return false;
+        String query = "UPDATE adres SET postcode = ?, huisnummer = ?, straat = ?, woonplaats = ?, reiziger_id = ?  WHERE adres_id = ?";
+        PreparedStatement ps = null;
+        try  {
+            ps = conn.prepareStatement(query);
+            ps.setString(1, adres.getPostcode());
+            ps.setString(2, adres.getHuisnummer());
+            ps.setString(3, adres.getStraat());
+            ps.setString(4, adres.getWoonplaats());
+            ps.setInt(5, adres.getReiziger().getId());
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public boolean delete(Adres adres) {
-        return false;
+        String query = "DELETE FROM adres WHERE adres_id = ?";
+        PreparedStatement ps = null;
+        try  {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, adres.getId());
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     @Override
     public Adres findByReiziger(int id) {
-        return null;
+        String query = "SELECT * FROM adres WHERE reiziger_id = ?";
+        Adres adres = null;
+        PreparedStatement ps = null;
+
+        try {
+            ps = conn.prepareStatement(query);
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                adres = new Adres();
+                adres.setId(rs.getInt("adres_id"));
+                adres.setPostcode(rs.getString("postcode"));
+                adres.setHuisnummer(rs.getString("huisnummer"));
+                adres.setStraat(rs.getString("straat"));
+                adres.setWoonplaats(rs.getString("woonplaats"));
+                adres.getReiziger().setId(rs.getInt("reiziger_id"));
+
+            }
+
+            rs.close();
+            ps.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return adres;
     }
 
     @Override

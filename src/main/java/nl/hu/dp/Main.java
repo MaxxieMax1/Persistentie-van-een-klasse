@@ -1,7 +1,10 @@
 package nl.hu.dp;
 
+import nl.hu.dp.DAO.AdresDAO;
+import nl.hu.dp.DAO.AdresDAOPsql;
 import nl.hu.dp.DAO.ReizigerDAO;
 import nl.hu.dp.DAO.ReizigerDAOPsql;
+import nl.hu.dp.MOD.Adres;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;
@@ -9,12 +12,14 @@ import java.util.List;
 
 public class Main {
     public static void main(String[] args) {
-        try{
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
+        try {
+            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5433/ovchipkaart", "postgres", "H0meW0rk");
             ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn);
             testReizigerDAO(reizigerDAOPsql);
+            AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
+            testAdresDAO(adresDAOPsql);
 
-        }catch (Exception exp){
+        } catch (Exception exp) {
             exp.printStackTrace();
         }
 
@@ -22,7 +27,7 @@ public class Main {
 
     /**
      * P2. Reiziger DAO: persistentie van een klasse
-     *
+     * <p>
      * Deze methode test de CRUD-functionaliteit van de Reiziger DAO
      *
      * @throws SQLException
@@ -54,10 +59,10 @@ public class Main {
         System.out.println("Reiziger met id 77 na update: " + updatedSietske + "\n");
 
         // Test de findByGbdatum-functionaliteit
-        System.out.println("[Test] Vind de geboortedatum van de reiziger met geb "+ gbdatum);
+        System.out.println("[Test] Vind de geboortedatum van de reiziger met geb " + gbdatum);
         List<Reiziger> reizigersMetGeb = rdao.findByGbdatum(java.sql.Date.valueOf(gbdatum));
         System.out.println("Reizigers met deze geboortedatum:");
-        for (Reiziger r : reizigersMetGeb){
+        for (Reiziger r : reizigersMetGeb) {
             System.out.println(r);
         }
         System.out.println();
@@ -78,5 +83,23 @@ public class Main {
 
     }
 
+    private static void testAdresDAO(AdresDAO adao) throws SQLException {
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
 
+        Adres adres = new Adres();
+        adres.setId(132);
+        adres.setPostcode("1234AB");
+        adres.setHuisnummer("12");
+        adres.setStraat("Hoofdstraat");
+        adres.setWoonplaats("Utrecht");
+        adres.setReiziger(sietske);
+
+        List<Adres> adreslijst = adao.findAll();
+
+        System.out.print("[Test] Eerst " + adreslijst.size() + " reizigers, na ReizigerDAO.save() ");
+        adao.save(adres);
+
+        System.out.println(adreslijst.size() + " reizigers\n");
     }
+}
