@@ -3,10 +3,8 @@ package nl.hu.dp.DAO;
 import nl.hu.dp.MOD.Adres;
 import nl.hu.dp.MOD.Reiziger;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class AdresDAOPsql  implements AdresDAO{
@@ -50,6 +48,8 @@ public class AdresDAOPsql  implements AdresDAO{
             ps.setString(3, adres.getStraat());
             ps.setString(4, adres.getWoonplaats());
             ps.setInt(5, adres.getReiziger().getId());
+            ps.setInt(6, adres.getId());
+
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -92,7 +92,10 @@ public class AdresDAOPsql  implements AdresDAO{
                 adres.setHuisnummer(rs.getString("huisnummer"));
                 adres.setStraat(rs.getString("straat"));
                 adres.setWoonplaats(rs.getString("woonplaats"));
-                adres.getReiziger().setId(rs.getInt("reiziger_id"));
+
+                Reiziger reiziger = new Reiziger();
+                reiziger.setId(rs.getInt("reiziger_id"));
+                adres.setReiziger(reiziger);
 
             }
 
@@ -106,6 +109,26 @@ public class AdresDAOPsql  implements AdresDAO{
 
     @Override
     public List<Adres> findAll() {
-        return List.of();
+        String query = "SELECT * FROM adres";
+        List<Adres> adressen = new ArrayList<>();
+        try{
+            Statement st = conn.createStatement();
+            ResultSet rs = st.executeQuery(query);
+            while (rs.next()){
+                Adres adres = new Adres();
+                adres.setId(rs.getInt("adres_id"));
+                adres.setPostcode(rs.getString("postcode"));
+                adres.setHuisnummer(rs.getString("huisnummer"));
+                adres.setStraat(rs.getString("straat"));
+                adres.setWoonplaats(rs.getString("woonplaats"));
+
+                adressen.add(adres);
+            }
+            rs.close();
+            st.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return adressen;
     }
 }

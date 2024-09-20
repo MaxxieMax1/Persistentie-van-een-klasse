@@ -19,6 +19,10 @@ public class Reiziger {
         this.datum = datum;
     }
 
+    public Reiziger() {
+
+    }
+
     public int getId() {
         return id;
     }

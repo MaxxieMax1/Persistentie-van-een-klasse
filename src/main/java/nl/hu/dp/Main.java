@@ -13,7 +13,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] args) {
         try {
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5433/ovchipkaart", "postgres", "H0meW0rk");
+            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
             ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn);
             testReizigerDAO(reizigerDAOPsql);
             AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
@@ -79,27 +79,55 @@ public class Main {
         } else {
             System.out.println("Er is iets misgegaan, reiziger met id 77 bestaat nog steeds: " + deletedSietske + "\n");
         }
+        Reiziger sietske2 = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
+        rdao.save(sietske);
+
 
 
     }
 
     private static void testAdresDAO(AdresDAO adao) throws SQLException {
-        String gbdatum = "1981-03-14";
-        Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
+        Reiziger testReiziger = new Reiziger();
+        testReiziger.setId(77);
 
         Adres adres = new Adres();
-        adres.setId(132);
+        adres.setId(12);
         adres.setPostcode("1234AB");
-        adres.setHuisnummer("12");
-        adres.setStraat("Hoofdstraat");
-        adres.setWoonplaats("Utrecht");
-        adres.setReiziger(sietske);
+        adres.setHuisnummer("12A");
+        adres.setStraat("Teststraat");
+        adres.setWoonplaats("Teststad");
+        adres.setReiziger(testReiziger);
 
-        List<Adres> adreslijst = adao.findAll();
+        boolean saved = adao.save(adres);
+        System.out.println("Adres saved: " + saved);
 
-        System.out.print("[Test] Eerst " + adreslijst.size() + " reizigers, na ReizigerDAO.save() ");
-        adao.save(adres);
+        List<Adres> adressen = adao.findAll();
+        System.out.println("All Adressen:");
+        for (Adres a : adressen) {
+            System.out.println(a);
+        }
+        // Test findByReiziger method
+        Adres foundAdres = adao.findByReiziger(1);
+        System.out.println("Found Adres by Reiziger ID 1: " + foundAdres);
 
-        System.out.println(adreslijst.size() + " reizigers\n");
+        // Update test data
+        adres.setPostcode("5678CD");
+        adao.update(adres);
+        Adres updatedAdres = adao.findByReiziger(77);
+        System.out.println("Adres updated: " + updatedAdres);
+
+
+//        System.out.println("[Test] Update de naam van de reiziger met id 77.");
+//        sietske.setAchternaam("Bakker");
+//        rdao.update(sietske);
+//        Reiziger updatedSietske = rdao.findBy(77);
+//        System.out.println("Reiziger met id 77 na update: " + updatedSietske + "\n");
+
+        // Delete test data
+        boolean deleted = adao.delete(adres);
+        System.out.println("Adres deleted: " + deleted);
+
+        adressen = adao.findAll();
+
     }
 }
