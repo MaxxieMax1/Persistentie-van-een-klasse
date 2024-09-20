@@ -67,17 +67,14 @@ public class Reiziger {
         return adres;
     }
 
-    //    public String getNaam(){
-//    }
+    public void setAdres(Adres adres) {
+        this.adres = adres;
+    }
 
-    @Override
     public String toString() {
-        return "["+
-                id + " -" +
-                " " + voorletters +
-                " " + tussenvoegsel +
-                " " + achternaam +
-                " " + "- " + datum + "]"
-                ;
+        String naam = voorletters + (tussenvoegsel == null || tussenvoegsel.isEmpty() ? " " : " " + tussenvoegsel + " ") + achternaam;
+        String gebDatum = "geb. " + datum;
+        String adresStr = adres != null ? ", " + adres : "";  // Controleer of een adres aanwezig is
+        return "Reiziger {#" + id + " " + naam + ", " + gebDatum + adresStr + "}";
     }
 }

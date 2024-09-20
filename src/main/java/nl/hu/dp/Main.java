@@ -14,9 +14,10 @@ public class Main {
     public static void main(String[] args) {
         try {
             Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
-            ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn);
-            testReizigerDAO(reizigerDAOPsql);
             AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
+            ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn, adresDAOPsql);
+            testReizigerDAO(reizigerDAOPsql);
+
             testAdresDAO(adresDAOPsql);
 
         } catch (Exception exp) {
@@ -35,7 +36,6 @@ public class Main {
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
-        // Haal alle reizigers op uit de database
         List<Reiziger> reizigers = rdao.findAll();
         System.out.println("[Test] ReizigerDAO.findAll() geeft de volgende reizigers:");
         for (Reiziger r : reizigers) {

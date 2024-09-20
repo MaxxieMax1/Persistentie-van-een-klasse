@@ -16,14 +16,9 @@ public class AdresDAOPsql  implements AdresDAO{
 
     @Override
     public boolean save(Adres adres) throws SQLException {
-        PreparedStatement statement = this.conn.prepareStatement("INSERT INTO adres " +
-                "(adres_id," +
-                " postcode," +
-                " huisnummer," +
-                " straat," +
-                "woonplaats," +
-                " reiziger_id) " +
-                "VALUES (?, ?, ?, ?, ?, ?)");
+        PreparedStatement statement = this.conn.prepareStatement(
+                "INSERT INTO adres (adres_id, postcode, huisnummer, straat, woonplaats, reiziger_id) VALUES (?, ?, ?, ?, ?, ?)"
+        );
         statement.setInt(1, adres.getId());
         statement.setString(2, adres.getPostcode());
         statement.setString(3, adres.getHuisnummer());
@@ -49,7 +44,6 @@ public class AdresDAOPsql  implements AdresDAO{
             ps.setString(4, adres.getWoonplaats());
             ps.setInt(5, adres.getReiziger().getId());
             ps.setInt(6, adres.getId());
-
 
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -86,17 +80,18 @@ public class AdresDAOPsql  implements AdresDAO{
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                int id2 = rs.getInt("adres_id");
+                String postcode = rs.getString("postcode");
+                String huisnummer = rs.getString("huisnummer");
+                String straat = rs.getString("straat");
+                String woonplaats = rs.getString("woonplaats");
+
                 adres = new Adres();
-                adres.setId(rs.getInt("adres_id"));
-                adres.setPostcode(rs.getString("postcode"));
-                adres.setHuisnummer(rs.getString("huisnummer"));
-                adres.setStraat(rs.getString("straat"));
-                adres.setWoonplaats(rs.getString("woonplaats"));
-
-                Reiziger reiziger = new Reiziger();
-                reiziger.setId(rs.getInt("reiziger_id"));
-                adres.setReiziger(reiziger);
-
+                adres.setId(id2);
+                adres.setPostcode(postcode);
+                adres.setHuisnummer(huisnummer);
+                adres.setStraat(straat);
+                adres.setWoonplaats(woonplaats);
             }
 
             rs.close();
@@ -104,6 +99,7 @@ public class AdresDAOPsql  implements AdresDAO{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
         return adres;
     }
 
