@@ -2,6 +2,7 @@ package nl.hu.dp.DAO;
 
 //import com.sun.jdi.connect.spi.Connection;
 import nl.hu.dp.MOD.Adres;
+import nl.hu.dp.MOD.OVChipkaart;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;
@@ -11,9 +12,12 @@ import java.util.List;
 public class ReizigerDAOPsql implements ReizigerDAO{
     private Connection conn;
     AdresDAO adresDAO;
-    public ReizigerDAOPsql(Connection conn, AdresDAO adresDAO) {
+    OVChipkaartDAO ovChipkaartDAO;
+
+    public ReizigerDAOPsql(Connection conn, AdresDAO adresDAO, OVChipkaartDAO ovChipkaartDAO) {
         this.conn = conn;
         this.adresDAO = adresDAO;
+        this.ovChipkaartDAO = ovChipkaartDAO;
     }
 
 
@@ -33,6 +37,9 @@ public class ReizigerDAOPsql implements ReizigerDAO{
 
         if (reiziger.getAdres() != null) {
             adresDAO.save(reiziger.getAdres());
+        }
+        for (OVChipkaart ovChipkaart : reiziger.getOVChipkaart()){
+            ovChipkaartDAO.save(ovChipkaart);
         }
 
         statement.close();

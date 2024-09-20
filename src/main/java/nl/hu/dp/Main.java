@@ -1,10 +1,8 @@
 package nl.hu.dp;
 
-import nl.hu.dp.DAO.AdresDAO;
-import nl.hu.dp.DAO.AdresDAOPsql;
-import nl.hu.dp.DAO.ReizigerDAO;
-import nl.hu.dp.DAO.ReizigerDAOPsql;
+import nl.hu.dp.DAO.*;
 import nl.hu.dp.MOD.Adres;
+import nl.hu.dp.MOD.OVChipkaart;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;
@@ -15,10 +13,14 @@ public class Main {
         try {
             Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
             AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
-            ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn, adresDAOPsql);
-            testReizigerDAO(reizigerDAOPsql);
+            OVChipkaartDAOPsql ovChipkaartDAOPsql = new OVChipkaartDAOPsql(myConn);
+            ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn, adresDAOPsql, ovChipkaartDAOPsql);
 
+            ovChipkaartDAOPsql.setReizigerDAO(reizigerDAOPsql);
+
+            testReizigerDAO(reizigerDAOPsql);
             testAdresDAO(adresDAOPsql);
+            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
 
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -79,6 +81,7 @@ public class Main {
         } else {
             System.out.println("Er is iets misgegaan, reiziger met id 77 bestaat nog steeds: " + deletedSietske + "\n");
         }
+//        Heb ik er in staan zodat je het kan gebruiken in de testADresDAO
         Reiziger sietske2 = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
         rdao.save(sietske);
 
@@ -116,13 +119,6 @@ public class Main {
         Adres updatedAdres = adao.findByReiziger(77);
         System.out.println("Adres updated: " + updatedAdres);
 
-
-//        System.out.println("[Test] Update de naam van de reiziger met id 77.");
-//        sietske.setAchternaam("Bakker");
-//        rdao.update(sietske);
-//        Reiziger updatedSietske = rdao.findBy(77);
-//        System.out.println("Reiziger met id 77 na update: " + updatedSietske + "\n");
-
         // Delete test data
         boolean deleted = adao.delete(adres);
         System.out.println("Adres deleted: " + deleted);
@@ -130,4 +126,51 @@ public class Main {
         adressen = adao.findAll();
 
     }
+
+    private static void testOVChipkaartDAO(OVChipkaartDAO ovdao, ReizigerDAO rdao) throws SQLException {
+        System.out.println("\n---------- Test OVChipkaartDAO -------------");
+
+        // Maak een test Reiziger aan
+        Reiziger testReiziger = new Reiziger(88, "S", "", "Boers", java.sql.Date.valueOf("1981-03-14"));
+        rdao.save(testReiziger);
+
+        // Maak een test OVChipkaart aan
+        OVChipkaart ovChipkaart = new OVChipkaart();
+        ovChipkaart.setKaart_nummer(12345);
+        ovChipkaart.setGeldig_tot(Date.valueOf("2025-12-31"));
+        ovChipkaart.setKlasse(1);
+        ovChipkaart.setSaldo(50.0);
+        ovChipkaart.setReiziger(testReiziger);
+
+        // Test de save() functionaliteit
+        boolean saved = ovdao.save(ovChipkaart);
+        System.out.println("OVChipkaart saved: " + saved);
+
+        // Test findByReiziger() om de kaarten voor een specifieke reiziger te vinden
+        List<OVChipkaart> kaartenVoorReiziger = ovdao.findByReiziger(testReiziger);
+        System.out.println("Found OVChipkaarten by Reiziger ID " + testReiziger.getId() + ":");
+        for (OVChipkaart ov : kaartenVoorReiziger) {
+            System.out.println(ov);
+        }
+
+        // Test de update() functionaliteit
+        ovChipkaart.setKlasse(2);
+        ovdao.update(ovChipkaart);
+        OVChipkaart updatedOVChipkaart = ovdao.findByKaartNummer(12345);
+        System.out.println("OVChipkaart updated: " + updatedOVChipkaart);
+
+        // Test de delete() functionaliteit
+        boolean deleted = ovdao.delete(ovChipkaart);
+        System.out.println("OVChipkaart deleted: " + deleted);
+
+        // Zorg dat de kaart niet meer bestaat in de database
+        OVChipkaart deletedOVChipkaart = ovdao.findByKaartNummer(12345);
+        if (deletedOVChipkaart == null) {
+            System.out.println("OVChipkaart met kaartnummer 12345 is succesvol verwijderd.");
+        } else {
+            System.out.println("Er is iets misgegaan, OVChipkaart bestaat nog steeds: " + deletedOVChipkaart);
+        }
+    }
+
+
 }
