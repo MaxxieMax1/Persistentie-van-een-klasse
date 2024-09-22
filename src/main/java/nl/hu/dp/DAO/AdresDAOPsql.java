@@ -69,38 +69,30 @@ public class AdresDAOPsql  implements AdresDAO{
     }
 
     @Override
-    public Adres findByReiziger(int id) {
-        String query = "SELECT * FROM adres WHERE reiziger_id = ?";
-        Adres adres = null;
-        PreparedStatement ps = null;
-
+    public Adres findByReiziger(int reizigerId) {
         try {
-            ps = conn.prepareStatement(query);
-            ps.setInt(1, id);
+            String query = "SELECT * FROM adres WHERE reiziger_id = ?";
+            PreparedStatement ps = conn.prepareStatement(query);
+            ps.setInt(1, reizigerId);
             ResultSet rs = ps.executeQuery();
-
             if (rs.next()) {
-                int id2 = rs.getInt("adres_id");
-                String postcode = rs.getString("postcode");
-                String huisnummer = rs.getString("huisnummer");
-                String straat = rs.getString("straat");
-                String woonplaats = rs.getString("woonplaats");
+                Adres adres = new Adres();
+                adres.setId(rs.getInt("adres_id"));
+                adres.setPostcode(rs.getString("postcode"));
+                adres.setHuisnummer(rs.getString("huisnummer"));
+                adres.setStraat(rs.getString("straat"));
+                adres.setWoonplaats(rs.getString("woonplaats"));
 
-                adres = new Adres();
-                adres.setId(id2);
-                adres.setPostcode(postcode);
-                adres.setHuisnummer(huisnummer);
-                adres.setStraat(straat);
-                adres.setWoonplaats(woonplaats);
+                Reiziger reiziger = new Reiziger();
+                reiziger.setId(reizigerId);
+                adres.setReiziger(reiziger);
+
+                return adres;
             }
-
-            rs.close();
-            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return adres;
+        return null;
     }
 
     @Override

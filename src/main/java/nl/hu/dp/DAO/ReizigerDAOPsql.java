@@ -58,6 +58,14 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ps.setInt(5, reiziger.getId());
             int rowsAffected = ps.executeUpdate();
 
+            if (reiziger.getAdres() != null) {
+                if (adresDAO.findByReiziger(reiziger.getId()) != null) {
+                    adresDAO.update(reiziger.getAdres());
+                }else {
+                    adresDAO.save(reiziger.getAdres());
+                }
+            }
+
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -70,6 +78,11 @@ public class ReizigerDAOPsql implements ReizigerDAO{
         PreparedStatement ps = null;
         try  {
             ps = conn.prepareStatement(query);
+
+            if (reiziger.getAdres() != null) {
+                adresDAO.delete(reiziger.getAdres());
+            }
+
             ps.setInt(1, reiziger.getId());
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
@@ -87,13 +100,17 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new Reiziger(
+                    Reiziger reiziger = new Reiziger(
                             rs.getInt("reiziger_id"),
                             rs.getString("voorletters"),
                             rs.getString("tussenvoegsel"),
                             rs.getString("achternaam"),
                             rs.getDate("geboortedatum")
                     );
+                    Adres adres = adresDAO.findByReiziger(id);
+                    reiziger.setAdres(adres);
+
+                    return reiziger;
                 }
             }
         } catch (SQLException e) {
@@ -111,13 +128,16 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ps.setDate(1, date);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    reizigers.add(new Reiziger(
+                    Reiziger reiziger = new Reiziger(
                             rs.getInt("reiziger_id"),
                             rs.getString("voorletters"),
                             rs.getString("tussenvoegsel"),
                             rs.getString("achternaam"),
                             rs.getDate("geboortedatum")
-                    ));
+                    );
+                    Adres adres = adresDAO.findByReiziger(reiziger.getId());
+                    reiziger.setAdres(adres);
+                    reizigers.add(reiziger);
                 }
             }
         } catch (SQLException e) {

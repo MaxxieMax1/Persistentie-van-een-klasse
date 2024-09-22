@@ -18,9 +18,10 @@ public class Main {
 
             ovChipkaartDAOPsql.setReizigerDAO(reizigerDAOPsql);
 
-            testReizigerDAO(reizigerDAOPsql);
-            testAdresDAO(adresDAOPsql);
-            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
+//            testReizigerDAO(reizigerDAOPsql);
+//            testAdresDAO(adresDAOPsql, reizigerDAOPsql);
+            testReizigerEnAdresUpdateEnVerwijder(reizigerDAOPsql, adresDAOPsql);
+//            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
 
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -81,15 +82,62 @@ public class Main {
         } else {
             System.out.println("Er is iets misgegaan, reiziger met id 77 bestaat nog steeds: " + deletedSietske + "\n");
         }
-//        Heb ik er in staan zodat je het kan gebruiken in de testADresDAO
-        Reiziger sietske2 = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
-        rdao.save(sietske);
-
-
-
     }
 
-    private static void testAdresDAO(AdresDAO adao) throws SQLException {
+    private static void testReizigerEnAdresUpdateEnVerwijder(ReizigerDAOPsql rdao, AdresDAO adao) throws SQLException {
+        // Voeg een nieuwe reiziger met adres toe
+        String gbdatum = "1990-01-01";
+        Reiziger testReiziger = new Reiziger(100, "T", "van", "Test", java.sql.Date.valueOf(gbdatum));
+
+        Adres testAdres = new Adres();
+        testAdres.setId(100);
+        testAdres.setPostcode("1234AB");
+        testAdres.setHuisnummer("10");
+        testAdres.setStraat("Teststraat");
+        testAdres.setWoonplaats("Teststad");
+        testAdres.setReiziger(testReiziger);
+
+        testReiziger.setAdres(testAdres);
+        // Sla de reiziger op
+        System.out.println("Opslaan van nieuwe reiziger en adres:");
+        rdao.save(testReiziger);
+        System.out.println("Reiziger en adres opgeslagen.");
+
+        // Controleer of de reiziger en het adres correct zijn opgeslagen
+        Reiziger gevondenReiziger = rdao.findBy(100);
+        System.out.println("Opgeslagen Reiziger: " + gevondenReiziger);
+        System.out.println("Bijbehorend Adres: " + gevondenReiziger.getAdres());
+
+        // Update de reiziger en het adres
+        System.out.println("\nUpdaten van de reiziger en zijn adres:");
+        gevondenReiziger.setAchternaam("TestUpdated");
+        gevondenReiziger.getAdres().setPostcode("4321BA");
+        gevondenReiziger.getAdres().setWoonplaats("UpdateStad");
+
+        rdao.update(gevondenReiziger);
+        Reiziger updatedReiziger = rdao.findBy(100);
+        System.out.println("Geüpdatete Reiziger: " + updatedReiziger);
+        System.out.println("Geüpdatete Adres: " + updatedReiziger.getAdres());
+
+        // Verwijder de reiziger en controleer of het adres ook verwijderd is
+        System.out.println("\nVerwijderen van reiziger en zijn adres:");
+        rdao.delete(updatedReiziger);
+
+        // Controleer of de reiziger is verwijderd
+        Reiziger verwijderdeReiziger = rdao.findBy(100);
+        System.out.println("Verwijderde Reiziger: " + verwijderdeReiziger);
+
+        // Controleer of het adres ook verwijderd is
+        Adres verwijderdeAdres = adao.findByReiziger(100);
+        System.out.println("Verwijderde Adres: " + verwijderdeAdres);
+    }
+
+
+    private static void testAdresDAO(AdresDAO adao, ReizigerDAOPsql rdao) throws SQLException {
+        String gbdatum = "1981-03-14";
+        Reiziger sietske = new Reiziger(77, "S", "", "Boers", java.sql.Date.valueOf(gbdatum));
+        rdao.save(sietske);
+
         Reiziger testReiziger = new Reiziger();
         testReiziger.setId(77);
 
@@ -110,7 +158,7 @@ public class Main {
             System.out.println(a);
         }
         // Test findByReiziger method
-        Adres foundAdres = adao.findByReiziger(1);
+        Adres foundAdres = adao.findByReiziger(2);
         System.out.println("Found Adres by Reiziger ID 1: " + foundAdres);
 
         // Update test data
@@ -124,6 +172,8 @@ public class Main {
         System.out.println("Adres deleted: " + deleted);
 
         adressen = adao.findAll();
+
+        rdao.delete(sietske);
 
     }
 
