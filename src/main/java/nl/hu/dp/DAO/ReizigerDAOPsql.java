@@ -24,16 +24,16 @@ public class ReizigerDAOPsql implements ReizigerDAO{
 
     @Override
     public boolean save(Reiziger reiziger) throws SQLException {
-        PreparedStatement statement = this.conn.prepareStatement(
+        PreparedStatement ps = this.conn.prepareStatement(
                 "INSERT INTO reiziger (reiziger_id, voorletters, tussenvoegsel, achternaam, geboortedatum) VALUES (?, ?, ?, ?, ?)"
         );
-        statement.setInt(1, reiziger.getId());
-        statement.setString(2, reiziger.getVoorletters());
-        statement.setString(3, reiziger.getTussenvoegsel());
-        statement.setString(4, reiziger.getAchternaam());
-        statement.setDate(5, reiziger.getDatum());
+        ps.setInt(1, reiziger.getId());
+        ps.setString(2, reiziger.getVoorletters());
+        ps.setString(3, reiziger.getTussenvoegsel());
+        ps.setString(4, reiziger.getAchternaam());
+        ps.setDate(5, reiziger.getDatum());
 
-        statement.executeUpdate();
+        ps.executeUpdate();
 
         if (reiziger.getAdres() != null) {
             adresDAO.save(reiziger.getAdres());
@@ -42,7 +42,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
             ovChipkaartDAO.save(ovChipkaart);
         }
 
-        statement.close();
+        ps.close();
         return true;
     }
     @Override
@@ -65,7 +65,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     adresDAO.save(reiziger.getAdres());
                 }
             }
-
+            ps.close();
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,6 +85,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
 
             ps.setInt(1, reiziger.getId());
             int rowsAffected = ps.executeUpdate();
+            ps.close();
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -109,7 +110,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     );
                     Adres adres = adresDAO.findByReiziger(id);
                     reiziger.setAdres(adres);
-
+                    ps.close();
                     return reiziger;
                 }
             }
@@ -140,6 +141,7 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     reizigers.add(reiziger);
                 }
             }
+            ps.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -149,9 +151,11 @@ public class ReizigerDAOPsql implements ReizigerDAO{
     public List<Reiziger> findAll() {
         String query = "SELECT * FROM reiziger";
         List<Reiziger> reizigers = new ArrayList<>();
+        Statement st = null;
+        ResultSet rs = null;
         try  {
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
+            st = conn.createStatement();
+            rs = st.executeQuery(query);
             while (rs.next()) {
                 int id = rs.getInt("reiziger_id");
                 String voorletters = rs.getString("voorletters");
@@ -164,7 +168,10 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                 Adres adres = adresDAO.findByReiziger(id);
                 reiziger.setAdres(adres);
                 reizigers.add(reiziger);
+
             }
+            rs.close();
+            st.close();
         } catch (SQLException e) {
             e.printStackTrace();
         }

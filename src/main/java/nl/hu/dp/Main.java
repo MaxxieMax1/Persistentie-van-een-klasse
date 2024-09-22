@@ -18,7 +18,7 @@ public class Main {
 
             ovChipkaartDAOPsql.setReizigerDAO(reizigerDAOPsql);
 
-//            testReizigerDAO(reizigerDAOPsql);
+            testReizigerDAO(reizigerDAOPsql);
 //            testAdresDAO(adresDAOPsql, reizigerDAOPsql);
             testReizigerEnAdresUpdateEnVerwijder(reizigerDAOPsql, adresDAOPsql);
 //            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
@@ -130,6 +130,11 @@ public class Main {
         // Controleer of het adres ook verwijderd is
         Adres verwijderdeAdres = adao.findByReiziger(100);
         System.out.println("Verwijderde Adres: " + verwijderdeAdres);
+
+        List<Reiziger> testje = rdao.findAll();
+        for(Reiziger r: testje){
+            System.out.println(r);
+        }
     }
 
 

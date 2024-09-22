@@ -46,6 +46,7 @@ public class AdresDAOPsql  implements AdresDAO{
             ps.setInt(6, adres.getId());
 
             int rowsAffected = ps.executeUpdate();
+            ps.close();
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -61,6 +62,7 @@ public class AdresDAOPsql  implements AdresDAO{
             ps = conn.prepareStatement(query);
             ps.setInt(1, adres.getId());
             int rowsAffected = ps.executeUpdate();
+            ps.close();
             return rowsAffected > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,6 +89,9 @@ public class AdresDAOPsql  implements AdresDAO{
                 reiziger.setId(reizigerId);
                 adres.setReiziger(reiziger);
 
+                rs.close();
+                ps.close();
+
                 return adres;
             }
         } catch (SQLException e) {
@@ -100,8 +105,8 @@ public class AdresDAOPsql  implements AdresDAO{
         String query = "SELECT * FROM adres";
         List<Adres> adressen = new ArrayList<>();
         try{
-            Statement st = conn.createStatement();
-            ResultSet rs = st.executeQuery(query);
+            PreparedStatement ps = conn.prepareStatement(query);
+            ResultSet rs = ps.executeQuery(query);
             while (rs.next()){
                 Adres adres = new Adres();
                 adres.setId(rs.getInt("adres_id"));
@@ -113,7 +118,7 @@ public class AdresDAOPsql  implements AdresDAO{
                 adressen.add(adres);
             }
             rs.close();
-            st.close();
+            ps.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
