@@ -1,12 +1,22 @@
 package nl.hu.dp.MOD;
 
+import jakarta.persistence.*;
 import java.sql.Date;
 
+@Entity
+@Table(name = "ov_chipkaart")
 public class OVChipkaart {
+    @Id
+    @Column(name = "kaart_nummer")
     private int kaart_nummer;
+    @Column(name = "geldig_tot")
     private java.sql.Date geldig_tot;
+    @Column(name = "klasse")
     private int klasse;
+    @Column(name = "saldo")
     private double saldo;
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "reiziger_id", nullable = false)
     private Reiziger reiziger;
 
     public OVChipkaart() {

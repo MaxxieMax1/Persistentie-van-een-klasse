@@ -1,11 +1,26 @@
 package nl.hu.dp.MOD;
+import jakarta.persistence.*;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "adres")
 public class Adres {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "adres_id", nullable = false)
     private int id;
+    @Column(name = "postcode")
     private String postcode;
+    @Column(name = "huisnummer")
     private String huisnummer;
+    @Column(name = "straat")
     private String straat;
+    @Column(name = "woonplaats")
     private String woonplaats;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "reiziger_id", nullable = false)
     private Reiziger reiziger;
 
     public Adres() {

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Database connection settings -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/ovchipkaart</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password">H0meW0rk</property>
+
+        <!-- JDBC connection pool settings -->
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+
+        <property name="hibernate.show_sql">false</property>
+        <property name="hibernate.hbm2ddl.auto">update</property>
+
+        <!-- Mention annotated class (Entity) -->
+        <mapping class="nl.hu.dp.MOD.Reiziger"/>
+        <mapping class="nl.hu.dp.MOD.Adres"/>
+        <mapping class="nl.hu.dp.MOD.OVChipkaart"/>
+    </session-factory>
+</hibernate-configuration>

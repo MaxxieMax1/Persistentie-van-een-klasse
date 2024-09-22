@@ -1,16 +1,29 @@
 package nl.hu.dp.MOD;
+import jakarta.persistence.*;
+
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+@Entity
+@Table(name = "reiziger")
 public class Reiziger {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "reiziger_id")
     private int id;
+    @Column(name = "voorletters", nullable = false)
     private String voorletters;
+    @Column(name = "tussenvoegsel")
     private String tussenvoegsel;
+    @Column(name = "achternaam", nullable = false)
     private String achternaam;
+    @Column(name = "geboortedatum", nullable = false)
     private Date datum;
 
+    @OneToOne(mappedBy = "reiziger", cascade = CascadeType.ALL, orphanRemoval = true)
     private Adres adres;
+    @OneToMany(mappedBy = "reiziger", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OVChipkaart> OVChipkaart = new ArrayList<>();
 
     public Reiziger(int id, String voorletters, String tussenvoegsel, String achternaam, Date datum) {
