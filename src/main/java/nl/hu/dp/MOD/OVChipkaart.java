@@ -54,6 +54,6 @@ public class OVChipkaart {
     }
     @Override
     public String toString() {
-        return "OVChipkaart {#" + kaart_nummer + " geldig tot: " + geldig_tot + ", klasse: " + klasse + ", saldo: €" + saldo + "}";
+        return "OVChipkaart {#" + kaart_nummer + " geldig tot: " + geldig_tot + ", klasse: " + klasse + ", saldo: €" + saldo + (reiziger != null ? ", reiziger_id=" + reiziger.getId() : "") +"}";
     }
 }

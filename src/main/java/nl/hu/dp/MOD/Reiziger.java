@@ -77,14 +77,33 @@ public class Reiziger {
         return OVChipkaart;
     }
 
-    public void addOvChipkaart(OVChipkaart ovChipkaart) {
-        this.OVChipkaart.add(ovChipkaart);
+    public void setOVChipkaart(List<nl.hu.dp.MOD.OVChipkaart> OVChipkaart) {
+        this.OVChipkaart = OVChipkaart;
     }
 
+
     public String toString() {
-        String naam = voorletters + (tussenvoegsel == null || tussenvoegsel.isEmpty() ? " " : " " + tussenvoegsel + " ") + achternaam;
-        String gebDatum = "geb. " + datum;
-        String adresStr = adres != null ? ", " + adres : "";  // Controleer of een adres aanwezig is
-        return "Reiziger {#" + id + " " + naam + ", " + gebDatum + adresStr + "}";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Reiziger {#").append(id).append(" ")
+                .append(voorletters).append(" ")
+                .append((tussenvoegsel == null || tussenvoegsel.isEmpty()) ? "" : tussenvoegsel + " ")
+                .append(achternaam).append(", geb. ").append(datum);
+
+        if (adres != null) {
+            sb.append(", ").append(adres);
+        }
+
+        if (!OVChipkaart.isEmpty()) {
+            sb.append(", OVChipkaarten: [");
+            for (OVChipkaart ovChipkaart : OVChipkaart) {
+                sb.append(ovChipkaart).append(", ");
+            }
+            if (sb.length() > 0) {
+                sb.setLength(sb.length() - 2);
+            }
+            sb.append("]");
+        }
+        sb.append("}");
+        return sb.toString();
     }
 }

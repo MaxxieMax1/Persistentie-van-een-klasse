@@ -38,8 +38,11 @@ public class ReizigerDAOPsql implements ReizigerDAO{
         if (reiziger.getAdres() != null) {
             adresDAO.save(reiziger.getAdres());
         }
-        for (OVChipkaart ovChipkaart : reiziger.getOVChipkaart()){
-            ovChipkaartDAO.save(ovChipkaart);
+        List<OVChipkaart> ovChipkaarten = reiziger.getOVChipkaart();
+        if (ovChipkaarten != null && !ovChipkaarten.isEmpty()) {
+            for (OVChipkaart ovChipkaart : ovChipkaarten) {
+                ovChipkaartDAO.save(ovChipkaart);
+            }
         }
 
         ps.close();
@@ -65,6 +68,18 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     adresDAO.save(reiziger.getAdres());
                 }
             }
+            if (reiziger.getOVChipkaart() != null){
+                List<OVChipkaart> bestaandeKaarten = ovChipkaartDAO.findByReiziger(reiziger);
+
+                for (OVChipkaart ovChipkaart : reiziger.getOVChipkaart()) {
+                    if (bestaandeKaarten.contains(ovChipkaart)) {
+                        ovChipkaartDAO.update(ovChipkaart);
+                    } else {
+                        ovChipkaartDAO.save(ovChipkaart);
+                    }
+                }
+            }
+
             ps.close();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -81,6 +96,11 @@ public class ReizigerDAOPsql implements ReizigerDAO{
 
             if (reiziger.getAdres() != null) {
                 adresDAO.delete(reiziger.getAdres());
+            }
+            if (reiziger.getOVChipkaart() != null) {
+                for (OVChipkaart ovChipkaart : reiziger.getOVChipkaart()) {
+                    ovChipkaartDAO.delete(ovChipkaart);
+                }
             }
 
             ps.setInt(1, reiziger.getId());
@@ -110,12 +130,15 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     );
                     Adres adres = adresDAO.findByReiziger(id);
                     reiziger.setAdres(adres);
+                    List<OVChipkaart> ovchipkaarten = ovChipkaartDAO.findByReiziger(reiziger);
+                    reiziger.setOVChipkaart(ovchipkaarten);
                     ps.close();
                     return reiziger;
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
+
         }
         return null;
     }
@@ -138,6 +161,10 @@ public class ReizigerDAOPsql implements ReizigerDAO{
                     );
                     Adres adres = adresDAO.findByReiziger(reiziger.getId());
                     reiziger.setAdres(adres);
+
+                    List<OVChipkaart> ovchipkaarten = ovChipkaartDAO.findByReiziger(reiziger);
+                    reiziger.setOVChipkaart(ovchipkaarten);
+
                     reizigers.add(reiziger);
                 }
             }
@@ -167,6 +194,10 @@ public class ReizigerDAOPsql implements ReizigerDAO{
 
                 Adres adres = adresDAO.findByReiziger(id);
                 reiziger.setAdres(adres);
+
+                List<OVChipkaart> ovchipkaarten = ovChipkaartDAO.findByReiziger(reiziger);
+                reiziger.setOVChipkaart(ovchipkaarten);
+
                 reizigers.add(reiziger);
 
             }

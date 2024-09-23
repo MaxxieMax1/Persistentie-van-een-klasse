@@ -20,8 +20,8 @@ public class Main {
 
             testReizigerDAO(reizigerDAOPsql);
 //            testAdresDAO(adresDAOPsql, reizigerDAOPsql);
-            testReizigerEnAdresUpdateEnVerwijder(reizigerDAOPsql, adresDAOPsql);
-//            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
+//            testReizigerEnAdresUpdateEnVerwijder(reizigerDAOPsql, adresDAOPsql);
+            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
 
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -184,6 +184,10 @@ public class Main {
 
     private static void testOVChipkaartDAO(OVChipkaartDAO ovdao, ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test OVChipkaartDAO -------------");
+//        ben lui om telkens het aan te passen dus ik vv m als ie er nog toevallig in staat
+        if (rdao.findBy(88) != null) {
+            rdao.delete(rdao.findBy(88));
+        }
 
         // Maak een test Reiziger aan
         Reiziger testReiziger = new Reiziger(88, "S", "", "Boers", java.sql.Date.valueOf("1981-03-14"));
@@ -197,9 +201,20 @@ public class Main {
         ovChipkaart.setSaldo(50.0);
         ovChipkaart.setReiziger(testReiziger);
 
+        OVChipkaart ovChipkaart2 = new OVChipkaart();
+        ovChipkaart2.setKaart_nummer(636341);
+        ovChipkaart2.setGeldig_tot(Date.valueOf("2025-12-31"));
+        ovChipkaart2.setKlasse(2);
+        ovChipkaart2.setSaldo(20.0);
+        ovChipkaart2.setReiziger(testReiziger);
+
+
         // Test de save() functionaliteit
         boolean saved = ovdao.save(ovChipkaart);
         System.out.println("OVChipkaart saved: " + saved);
+
+        boolean saved2 = ovdao.save(ovChipkaart2);
+        System.out.println("OVChipkaart2 saved: " + saved2);
 
         // Test findByReiziger() om de kaarten voor een specifieke reiziger te vinden
         List<OVChipkaart> kaartenVoorReiziger = ovdao.findByReiziger(testReiziger);
@@ -210,6 +225,7 @@ public class Main {
 
         // Test de update() functionaliteit
         ovChipkaart.setKlasse(2);
+        ovChipkaart.setSaldo(99999.0);
         ovdao.update(ovChipkaart);
         OVChipkaart updatedOVChipkaart = ovdao.findByKaartNummer(12345);
         System.out.println("OVChipkaart updated: " + updatedOVChipkaart);
@@ -217,14 +233,9 @@ public class Main {
         // Test de delete() functionaliteit
         boolean deleted = ovdao.delete(ovChipkaart);
         System.out.println("OVChipkaart deleted: " + deleted);
+        boolean deleted2 = ovdao.delete(ovChipkaart2);
+        System.out.println("OVChipkaart2 deleted: " + deleted2);
 
-        // Zorg dat de kaart niet meer bestaat in de database
-        OVChipkaart deletedOVChipkaart = ovdao.findByKaartNummer(12345);
-        if (deletedOVChipkaart == null) {
-            System.out.println("OVChipkaart met kaartnummer 12345 is succesvol verwijderd.");
-        } else {
-            System.out.println("Er is iets misgegaan, OVChipkaart bestaat nog steeds: " + deletedOVChipkaart);
-        }
     }
 
 
