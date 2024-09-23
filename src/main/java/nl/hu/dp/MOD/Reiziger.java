@@ -21,7 +21,7 @@ public class Reiziger {
     @Column(name = "geboortedatum", nullable = false)
     private Date datum;
 
-    @OneToOne(mappedBy = "reiziger", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "reiziger", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Adres adres;
     @OneToMany(mappedBy = "reiziger", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<OVChipkaart> OVChipkaart = new ArrayList<>();

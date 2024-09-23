@@ -19,7 +19,7 @@ public class Adres {
     private String straat;
     @Column(name = "woonplaats")
     private String woonplaats;
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reiziger_id", nullable = false)
     private Reiziger reiziger;
 
