@@ -184,7 +184,6 @@ public class Main {
 
     private static void testOVChipkaartDAO(OVChipkaartDAO ovdao, ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test OVChipkaartDAO -------------");
-//        ben lui om telkens het aan te passen dus ik vv m als ie er nog toevallig in staat
         if (rdao.findBy(88) != null) {
             rdao.delete(rdao.findBy(88));
         }
