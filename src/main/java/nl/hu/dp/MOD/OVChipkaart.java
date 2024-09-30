@@ -1,6 +1,8 @@
 package nl.hu.dp.MOD;
 
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 public class OVChipkaart {
     private int kaart_nummer;
@@ -8,6 +10,7 @@ public class OVChipkaart {
     private int klasse;
     private double saldo;
     private Reiziger reiziger;
+    private List<Product> producten = new ArrayList<>();
 
     public OVChipkaart() {
 
@@ -52,6 +55,15 @@ public class OVChipkaart {
     public void setReiziger(Reiziger reiziger) {
         this.reiziger = reiziger;
     }
+
+    public List<Product> getProducten() {
+        return producten;
+    }
+
+    public void setProducten(List<Product> producten) {
+        this.producten = producten;
+    }
+
     @Override
     public String toString() {
         return "OVChipkaart {#" + kaart_nummer + " geldig tot: " + geldig_tot + ", klasse: " + klasse + ", saldo: €" + saldo + (reiziger != null ? ", reiziger_id=" + reiziger.getId() : "") +"}";

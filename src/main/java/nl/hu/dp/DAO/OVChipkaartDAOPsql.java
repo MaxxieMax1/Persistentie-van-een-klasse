@@ -1,6 +1,7 @@
 package nl.hu.dp.DAO;
 
 import nl.hu.dp.MOD.OVChipkaart;
+import nl.hu.dp.MOD.Product;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;
@@ -10,6 +11,7 @@ import java.util.List;
 public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     private Connection conn;
     private ReizigerDAO reizigerDAO;
+    private ProductDAO productDAO;
 
 
     public OVChipkaartDAOPsql(Connection conn) {
@@ -31,6 +33,11 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         ps.setInt(5, ovChipkaart.getReiziger().getId());
         ps.executeUpdate();
         ps.close();
+        if (this.productDAO != null) {
+            for (Product product : ovChipkaart.getProducten()){
+                this.productDAO.save(product);
+            }
+        }
         return true;
     }
 
@@ -46,6 +53,11 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         ps.setInt(5, ovChipkaart.getKaart_nummer());
         ps.executeUpdate();
         ps.close();
+        if (this.productDAO != null) {
+            for (Product product : ovChipkaart.getProducten()){
+                this.productDAO.update(product);
+            }
+        }
         return true;
     }
 
@@ -57,6 +69,11 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         ps.setInt(1, ovChipkaart.getKaart_nummer());
         ps.executeUpdate();
         ps.close();
+        if (this.productDAO != null) {
+            for (Product product : ovChipkaart.getProducten()){
+                this.productDAO.delete(product);
+            }
+        }
         return true;
     }
 

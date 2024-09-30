@@ -3,9 +3,11 @@ package nl.hu.dp;
 import nl.hu.dp.DAO.*;
 import nl.hu.dp.MOD.Adres;
 import nl.hu.dp.MOD.OVChipkaart;
+import nl.hu.dp.MOD.Product;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
@@ -14,14 +16,18 @@ public class Main {
             Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
             AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
             OVChipkaartDAOPsql ovChipkaartDAOPsql = new OVChipkaartDAOPsql(myConn);
+            ProductDAOPsql productDAOPsql = new ProductDAOPsql(myConn);
             ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn, adresDAOPsql, ovChipkaartDAOPsql);
+
+            productDAOPsql.setOvChipkaartDAO(ovChipkaartDAOPsql);
 
             ovChipkaartDAOPsql.setReizigerDAO(reizigerDAOPsql);
 
-            testReizigerDAO(reizigerDAOPsql);
+//            testReizigerDAO(reizigerDAOPsql);
+            testVeelOpVeel(ovChipkaartDAOPsql, productDAOPsql, reizigerDAOPsql);
 //            testAdresDAO(adresDAOPsql, reizigerDAOPsql);
 //            testReizigerEnAdresUpdateEnVerwijder(reizigerDAOPsql, adresDAOPsql);
-            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
+//            testOVChipkaartDAO(ovChipkaartDAOPsql, reizigerDAOPsql);
 
         } catch (Exception exp) {
             exp.printStackTrace();
@@ -36,6 +42,73 @@ public class Main {
      *
      * @throws SQLException
      */
+    private static void testVeelOpVeel(OVChipkaartDAO ovChipkaartDAO, ProductDAO productDAO, ReizigerDAO reizigerDAO) throws SQLException {
+        List<Product> products = productDAO.findAll();
+        System.out.println("[Test] ProductDAO.findAll() geeft de volgende producten:");
+        for (Product p : products) {
+            System.out.println(p);
+        }
+        System.out.println();
+        System.out.println("--------------------------------------------------------------------");
+
+        // Testen van het toevoegen van een nieuw product
+        Product newProduct = new Product();
+        newProduct.setProduct_nummer(12345);
+        newProduct.setNaam("Test Product");
+        newProduct.setBeschrijving("Dit is een test product.");
+        newProduct.setPrijs(9.99);
+
+        // Veronderstellen dat er een OV-chipkaart bestaat met kaart_nummer 35283
+        List<OVChipkaart> kaart = new ArrayList<OVChipkaart>();
+        kaart.add(ovChipkaartDAO.findByKaartNummer(35283));
+        kaart.add(ovChipkaartDAO.findByKaartNummer(57401));
+        newProduct.setOvchipkaarten(kaart);
+
+        // Product opslaan in de database
+        boolean saveResult = productDAO.save(newProduct);
+        System.out.println("[Test] Product opslaan resultaat: " + saveResult);
+//
+//        // Controleer of het product succesvol is opgeslagen
+//        List<Product> retrievedProducts = productDAO.findByOVChipkaart(kaart);
+//        System.out.println("[Test] Producten gekoppeld aan OV-chipkaart " + kaart.getKaart_nummer() + ":");
+//        for (Product p : retrievedProducts) {
+//            System.out.println(p);
+//        }
+//
+//        // Verificatie: Controleer of ons nieuw opgeslagen product aanwezig is
+//        boolean productFound = retrievedProducts.stream().anyMatch(p -> p.getProduct_nummer() == newProduct.getProduct_nummer());
+//        System.out.println("[Test] Is het nieuwe product gevonden? " + productFound);
+//
+//        System.out.println("--------------------------------------------------------------------");
+//
+//        // Verwijder het nieuwe product
+//        boolean deleteResult = productDAO.delete(newProduct);
+//        System.out.println("[Test] Product verwijderen resultaat: " + deleteResult);
+//
+//        // Controleer of het product is verwijderd
+//        retrievedProducts = productDAO.findByOVChipkaart(kaart);
+//        productFound = retrievedProducts.stream().anyMatch(p -> p.getProduct_nummer() == newProduct.getProduct_nummer());
+//        System.out.println("[Test] Is het nieuwe product nog steeds aanwezig na verwijderen? " + productFound);
+//
+//        System.out.println("--------------------------------------------------------------------");
+//
+//        // Test het bijwerken van een bestaand product
+//        if (!products.isEmpty()) {
+//            Product existingProduct = products.get(0); // Neem het eerste product voor de update
+//            existingProduct.setPrijs(12.99); // Bijwerken van de prijs
+//
+//            boolean updateResult = productDAO.update(existingProduct);
+//            System.out.println("[Test] Product bijwerken resultaat: " + updateResult);
+//
+//            // Controleer of de update succesvol was
+//            Product updatedProduct = productDAO.findByOVChipkaart(kaart).stream()
+//                    .filter(p -> p.getProduct_nummer() == existingProduct.getProduct_nummer())
+//                    .findFirst().orElse(null);
+//
+//            System.out.println("[Test] Bijgewerkt product: " + updatedProduct);
+//            System.out.println("--------------------------------------------------------------------");
+//        }
+    }
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
