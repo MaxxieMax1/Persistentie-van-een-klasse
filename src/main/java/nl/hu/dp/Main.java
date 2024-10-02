@@ -50,6 +50,16 @@ public class Main {
         }
         System.out.println();
         System.out.println("--------------------------------------------------------------------");
+//        Dit wordt de test OvChipkaart
+        if (ovChipkaartDAO.findByKaartNummer(12345) == null) {
+            OVChipkaart ovChipkaart = new OVChipkaart();
+            ovChipkaart.setKaart_nummer(12345);
+            ovChipkaart.setGeldig_tot(Date.valueOf("2025-12-31"));
+            ovChipkaart.setKlasse(1);
+            ovChipkaart.setSaldo(50.0);
+            ovChipkaart.setReiziger(reizigerDAO.findBy(2));
+            ovChipkaartDAO.save(ovChipkaart);
+        }
 
         // Testen van het toevoegen van een nieuw product
         Product newProduct = new Product();
@@ -58,57 +68,33 @@ public class Main {
         newProduct.setBeschrijving("Dit is een test product.");
         newProduct.setPrijs(9.99);
 
-        // Veronderstellen dat er een OV-chipkaart bestaat met kaart_nummer 35283
-        List<OVChipkaart> kaart = new ArrayList<OVChipkaart>();
-        kaart.add(ovChipkaartDAO.findByKaartNummer(35283));
+        List<OVChipkaart> kaart = new ArrayList<>();
         kaart.add(ovChipkaartDAO.findByKaartNummer(57401));
         newProduct.setOvchipkaarten(kaart);
 
         // Product opslaan in de database
         boolean saveResult = productDAO.save(newProduct);
         System.out.println("[Test] Product opslaan resultaat: " + saveResult);
-//
-//        // Controleer of het product succesvol is opgeslagen
-//        List<Product> retrievedProducts = productDAO.findByOVChipkaart(kaart);
-//        System.out.println("[Test] Producten gekoppeld aan OV-chipkaart " + kaart.getKaart_nummer() + ":");
-//        for (Product p : retrievedProducts) {
-//            System.out.println(p);
-//        }
-//
-//        // Verificatie: Controleer of ons nieuw opgeslagen product aanwezig is
-//        boolean productFound = retrievedProducts.stream().anyMatch(p -> p.getProduct_nummer() == newProduct.getProduct_nummer());
-//        System.out.println("[Test] Is het nieuwe product gevonden? " + productFound);
-//
-//        System.out.println("--------------------------------------------------------------------");
-//
-//        // Verwijder het nieuwe product
-//        boolean deleteResult = productDAO.delete(newProduct);
-//        System.out.println("[Test] Product verwijderen resultaat: " + deleteResult);
-//
-//        // Controleer of het product is verwijderd
-//        retrievedProducts = productDAO.findByOVChipkaart(kaart);
-//        productFound = retrievedProducts.stream().anyMatch(p -> p.getProduct_nummer() == newProduct.getProduct_nummer());
-//        System.out.println("[Test] Is het nieuwe product nog steeds aanwezig na verwijderen? " + productFound);
-//
-//        System.out.println("--------------------------------------------------------------------");
-//
-//        // Test het bijwerken van een bestaand product
-//        if (!products.isEmpty()) {
-//            Product existingProduct = products.get(0); // Neem het eerste product voor de update
-//            existingProduct.setPrijs(12.99); // Bijwerken van de prijs
-//
-//            boolean updateResult = productDAO.update(existingProduct);
-//            System.out.println("[Test] Product bijwerken resultaat: " + updateResult);
-//
-//            // Controleer of de update succesvol was
-//            Product updatedProduct = productDAO.findByOVChipkaart(kaart).stream()
-//                    .filter(p -> p.getProduct_nummer() == existingProduct.getProduct_nummer())
-//                    .findFirst().orElse(null);
-//
-//            System.out.println("[Test] Bijgewerkt product: " + updatedProduct);
-//            System.out.println("--------------------------------------------------------------------");
-//        }
+
+//        update methode
+        kaart.add(ovChipkaartDAO.findByKaartNummer(12345));
+        newProduct.setOvchipkaarten(kaart);
+        newProduct.setNaam("Niuewe naam Product");
+        boolean updateResult = productDAO.update(newProduct);
+        System.out.println("[Test] Product updaten resultaat: " + updateResult);
+//        findByOV
+        List<Product> i = (productDAO.findByOVChipkaart(ovChipkaartDAO.findByKaartNummer(12345)));
+        for (Product p : i) {
+            System.out.println(p);
+        }
+//        Ovkaart verwijderen terwijl het product bestaat
+        boolean deleteOV = ovChipkaartDAO.delete(ovChipkaartDAO.findByKaartNummer(12345));
+        System.out.println("[Test] OV verwijderen resultaat: " + deleteOV);
+//        delete
+        boolean deleteResult = productDAO.delete(newProduct);
+        System.out.println("[Test] Product verwijderen resultaat: " + deleteResult);
     }
+
     private static void testReizigerDAO(ReizigerDAO rdao) throws SQLException {
         System.out.println("\n---------- Test ReizigerDAO -------------");
 
