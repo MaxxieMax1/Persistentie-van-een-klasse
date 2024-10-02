@@ -63,17 +63,20 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
     @Override
     public boolean delete(OVChipkaart ovChipkaart) throws SQLException {
+        PreparedStatement deleteAssociationsPs = conn.prepareStatement(
+                "DELETE FROM ov_chipkaart_product WHERE kaart_nummer = ?"
+        );
+        deleteAssociationsPs.setInt(1, ovChipkaart.getKaart_nummer());
+        deleteAssociationsPs.executeUpdate();
+        deleteAssociationsPs.close();
+
         PreparedStatement ps = conn.prepareStatement(
                 "DELETE FROM ov_chipkaart WHERE kaart_nummer = ?"
         );
         ps.setInt(1, ovChipkaart.getKaart_nummer());
         ps.executeUpdate();
         ps.close();
-        if (this.productDAO != null) {
-            for (Product product : ovChipkaart.getProducten()){
-                this.productDAO.delete(product);
-            }
-        }
+
         return true;
     }
 
@@ -152,4 +155,6 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
         return ovChipkaart;
     }
+
+
 }
