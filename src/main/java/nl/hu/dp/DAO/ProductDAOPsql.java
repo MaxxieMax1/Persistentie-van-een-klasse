@@ -69,16 +69,13 @@ public class ProductDAOPsql implements ProductDAO {
         ps.setInt(4, product.getProduct_nummer());
         ps.executeUpdate();
 
-        ps = conn.prepareStatement(
-                "DELETE FROM ovchipkaart_product WHERE product_nummer = ?"
-        );
+        ps = conn.prepareStatement("DELETE FROM ov_chipkaart_product WHERE product_nummer = ?");
         ps.setInt(1, product.getProduct_nummer());
         ps.executeUpdate();
 
         for (OVChipkaart ovChipkaart : product.getOvchipkaarten()) {
-            ovChipkaartDAO.save(ovChipkaart);
             PreparedStatement psLink = conn.prepareStatement(
-                    "INSERT INTO ovchipkaart_product (kaart_nummer, product_nummer) VALUES (?, ?)"
+                    "INSERT INTO ov_chipkaart_product (kaart_nummer, product_nummer) VALUES (?, ?)"
             );
             psLink.setInt(1, ovChipkaart.getKaart_nummer());
             psLink.setInt(2, product.getProduct_nummer());
@@ -104,7 +101,6 @@ public class ProductDAOPsql implements ProductDAO {
                 product.setNaam(rs.getString("naam"));
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
-                // Hier kan je ook de OVChipkaarten ophalen, indien nodig
                 products.add(product);
             }
         }
