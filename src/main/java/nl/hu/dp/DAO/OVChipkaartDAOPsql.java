@@ -82,20 +82,15 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
     @Override
     public List<OVChipkaart> findAll() throws SQLException {
-        Statement st = conn.createStatement();
-        ResultSet rs = st.executeQuery("SELECT * FROM ov_chipkaart");
-        List<OVChipkaart> ovChipkaarten = new ArrayList<>();
-        while (rs.next()) {
-            OVChipkaart ovChipkaart = new OVChipkaart();
-            ovChipkaart.setKaart_nummer(rs.getInt("kaart_nummer"));
-            ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
-            ovChipkaart.setKlasse(rs.getInt("klasse"));
-            ovChipkaart.setSaldo(rs.getDouble("saldo"));
-            ovChipkaarten.add(ovChipkaart);
+        List<Reiziger> reizigers = reizigerDAO.findAll();
+        List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
+
+        for (Reiziger reiziger : reizigers) {
+            List<OVChipkaart> ovChipkaartenVanReiziger = findByReiziger(reiziger);
+            alleOVChipkaarten.addAll(ovChipkaartenVanReiziger);
         }
-        rs.close();
-        st.close();
-        return ovChipkaarten;
+
+        return alleOVChipkaarten;
     }
 
     @Override
@@ -129,7 +124,10 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
     @Override
     public OVChipkaart findByKaartNummer(int kaartNummer) throws SQLException {
-        String query = "SELECT * FROM ov_chipkaart WHERE kaart_nummer = ?";
+        String query = "SELECT oc.*, r.reiziger_id, r.voorletters, r.tussenvoegsel, r.achternaam, r.geboortedatum " +
+                "FROM ov_chipkaart oc " +
+                "JOIN reiziger r ON oc.reiziger_id = r.reiziger_id " +
+                "WHERE oc.kaart_nummer = ?";
         OVChipkaart ovChipkaart = null;
 
         try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -137,14 +135,18 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
             ResultSet rs = ps.executeQuery();
 
             if (rs.next()) {
+                Reiziger reiziger = new Reiziger();
+                reiziger.setId(rs.getInt("reiziger_id"));
+                reiziger.setVoorletters(rs.getString("voorletters"));
+                reiziger.setTussenvoegsel(rs.getString("tussenvoegsel"));
+                reiziger.setAchternaam(rs.getString("achternaam"));
+                reiziger.setDatum(rs.getDate("geboortedatum"));
+
                 ovChipkaart = new OVChipkaart();
                 ovChipkaart.setKaart_nummer(rs.getInt("kaart_nummer"));
                 ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
                 ovChipkaart.setKlasse(rs.getInt("klasse"));
                 ovChipkaart.setSaldo(rs.getDouble("saldo"));
-
-                int reizigerId = rs.getInt("reiziger_id");
-                Reiziger reiziger = reizigerDAO.findBy(reizigerId);
                 ovChipkaart.setReiziger(reiziger);
             }
 
