@@ -24,7 +24,7 @@ public class ReizigerDAOHibernate implements ReizigerDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.save(reiziger);  // Slaat de reiziger op (inclusief Adres en OVChipkaarten door CascadeType.ALL)
+            session.save(reiziger);
             transaction.commit();
             return true;
         } catch (Exception e) {
@@ -39,7 +39,7 @@ public class ReizigerDAOHibernate implements ReizigerDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.update(reiziger);  // Update de reiziger
+            session.update(reiziger);
             transaction.commit();
             return true;
         } catch (Exception e) {
@@ -54,7 +54,7 @@ public class ReizigerDAOHibernate implements ReizigerDAO {
         Transaction transaction = null;
         try (Session session = sessionFactory.openSession()) {
             transaction = session.beginTransaction();
-            session.delete(reiziger);  // Verwijdert de reiziger
+            session.delete(reiziger);
             transaction.commit();
             return true;
         } catch (Exception e) {
@@ -67,14 +67,14 @@ public class ReizigerDAOHibernate implements ReizigerDAO {
     @Override
     public Reiziger findBy(int id) {
         try (Session session = sessionFactory.openSession()) {
-            return session.get(Reiziger.class, id);  // Haal reiziger op met het gegeven id
+            return session.get(Reiziger.class, id);
         }
     }
 
     @Override
     public List<Reiziger> findAll() {
         try (Session session = sessionFactory.openSession()) {
-            Query<Reiziger> query = session.createQuery("from Reiziger", Reiziger.class);  // HQL-query om alle reizigers op te halen
+            Query<Reiziger> query = session.createQuery("from Reiziger", Reiziger.class);
             return query.list();
         }
     }

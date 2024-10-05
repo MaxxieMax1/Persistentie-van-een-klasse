@@ -61,7 +61,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     }
 
     @Override
-    public List<OVChipkaart> getAll() throws SQLException {
+    public List<OVChipkaart> findAll() throws SQLException {
         Statement st = conn.createStatement();
         ResultSet rs = st.executeQuery("SELECT * FROM ov_chipkaart");
         List<OVChipkaart> ovChipkaarten = new ArrayList<>();
