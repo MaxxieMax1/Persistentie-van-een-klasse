@@ -8,7 +8,7 @@ public class Product {
     private String naam;
     private String Beschrijving;
     private double prijs;
-    private List<OVChipkaart> ovchipkaarten = new ArrayList<>();
+    private List<Integer> ovChipkaartNummers = new ArrayList<>();
 
     public Product() {
     }
@@ -45,12 +45,28 @@ public class Product {
         this.prijs = prijs;
     }
 
-    public List<OVChipkaart> getOvchipkaarten() {
-        return ovchipkaarten;
+    public List<Integer> getOvchipkaarten() {
+        return ovChipkaartNummers;
     }
 
-    public void setOvchipkaarten(List<OVChipkaart> ovchipkaarten) {
-        this.ovchipkaarten = ovchipkaarten;
+    public void setOvChipkaartNummers(List<Integer> ovChipkaartNummers) {
+        this.ovChipkaartNummers = ovChipkaartNummers;
+    }
+
+    public boolean addOVChipkaart(int kaartNummer) {
+        if (!ovChipkaartNummers.contains(kaartNummer)) {
+            ovChipkaartNummers.add(kaartNummer);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeOVChipkaart(int kaartNummer) {
+        if (ovChipkaartNummers.contains(kaartNummer)) {
+            ovChipkaartNummers.remove(kaartNummer); // Verwijder de OVChipkaart uit de lijst in Product
+            return true; // Retourneer true als de OVChipkaart succesvol is verwijderd
+        }
+        return false; // Retourneer false als de OVChipkaart niet in de lijst stond
     }
 
     @Override
@@ -60,6 +76,7 @@ public class Product {
                 ", naam='" + naam + '\'' +
                 ", beschrijving='" + Beschrijving + '\'' +
                 ", prijs=" + prijs +
+                ", ovChipkaartNummers=" + ovChipkaartNummers +
                 '}';
     }
 

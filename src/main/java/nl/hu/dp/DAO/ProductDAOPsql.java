@@ -30,11 +30,11 @@ public class ProductDAOPsql implements ProductDAO {
         ps.setString(3, product.getBeschrijving());
         ps.setDouble(4, product.getPrijs());
         ps.executeUpdate();
-        for (OVChipkaart ovChipkaart : product.getOvchipkaarten()) {
+        for (Integer kaartnummer : product.getOvchipkaarten()) {
             ps = this.conn.prepareStatement(
                     "INSERT INTO ov_chipkaart_product (kaart_nummer, product_nummer) VALUES (?, ?)"
             );
-            ps.setInt(1, ovChipkaart.getKaart_nummer());
+            ps.setInt(1, kaartnummer);
             ps.setInt(2, product.getProduct_nummer());
             ps.execute();
         }
@@ -73,17 +73,30 @@ public class ProductDAOPsql implements ProductDAO {
         ps.setInt(1, product.getProduct_nummer());
         ps.executeUpdate();
 
-        for (OVChipkaart ovChipkaart : product.getOvchipkaarten()) {
+        for (Integer kaartNummer : product.getOvchipkaarten()) {
             PreparedStatement psLink = conn.prepareStatement(
                     "INSERT INTO ov_chipkaart_product (kaart_nummer, product_nummer) VALUES (?, ?)"
             );
-            psLink.setInt(1, ovChipkaart.getKaart_nummer());
+            psLink.setInt(1,kaartNummer);
             psLink.setInt(2, product.getProduct_nummer());
             psLink.executeUpdate();
             psLink.close();
         }
 
         return true;
+    }
+
+    private List<Integer> findOvChipkaartNummersByProduct(int productNummer) throws SQLException {
+        List<Integer> kaartNummers = new ArrayList<>();
+        String query = "SELECT kaart_nummer FROM ov_chipkaart_product WHERE product_nummer = ?";
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ps.setInt(1, productNummer);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                kaartNummers.add(rs.getInt("kaart_nummer"));
+            }
+        }
+        return kaartNummers;
     }
 
     @Override
@@ -101,6 +114,10 @@ public class ProductDAOPsql implements ProductDAO {
                 product.setNaam(rs.getString("naam"));
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
+
+                List<Integer> kaartnummers = findOvChipkaartNummersByProduct(product.getProduct_nummer());
+                product.setOvChipkaartNummers(kaartnummers);
+
                 products.add(product);
             }
         }
@@ -119,6 +136,10 @@ public class ProductDAOPsql implements ProductDAO {
                 product.setNaam(rs.getString("naam"));
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
+
+                List<Integer> kaartNummers = findOvChipkaartNummersByProduct(product.getProduct_nummer());
+                product.setOvChipkaartNummers(kaartNummers);
+
                 products.add(product);
             }
         }
