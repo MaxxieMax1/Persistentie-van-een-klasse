@@ -21,5 +21,7 @@
         <mapping class="nl.hu.dp.MOD.Reiziger"/>
         <mapping class="nl.hu.dp.MOD.Adres"/>
         <mapping class="nl.hu.dp.MOD.OVChipkaart"/>
+        <mapping class="nl.hu.dp.MOD.Product"/>
+
     </session-factory>
 </hibernate-configuration>

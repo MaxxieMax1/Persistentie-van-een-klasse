@@ -2,6 +2,8 @@ package nl.hu.dp.MOD;
 
 import jakarta.persistence.*;
 import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "ov_chipkaart")
@@ -18,6 +20,9 @@ public class OVChipkaart {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reiziger_id", nullable = false)
     private Reiziger reiziger;
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "ov_chipkaart_product", joinColumns = @JoinColumn(name = "kaart_nummer"), inverseJoinColumns = @JoinColumn(name = "product_nummer"))
+    private List<Product> producten = new ArrayList<>();
 
     public OVChipkaart() {
 
@@ -61,6 +66,10 @@ public class OVChipkaart {
 
     public void setReiziger(Reiziger reiziger) {
         this.reiziger = reiziger;
+    }
+
+    public List<Product> getProducten() {
+        return producten;
     }
     @Override
     public String toString() {
