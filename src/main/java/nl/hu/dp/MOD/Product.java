@@ -63,10 +63,10 @@ public class Product {
 
     public boolean removeOVChipkaart(int kaartNummer) {
         if (ovChipkaartNummers.contains(kaartNummer)) {
-            ovChipkaartNummers.remove(kaartNummer); // Verwijder de OVChipkaart uit de lijst in Product
-            return true; // Retourneer true als de OVChipkaart succesvol is verwijderd
+            ovChipkaartNummers.remove(kaartNummer);
+            return true;
         }
-        return false; // Retourneer false als de OVChipkaart niet in de lijst stond
+        return false;
     }
 
     @Override
@@ -76,8 +76,9 @@ public class Product {
                 ", naam='" + naam + '\'' +
                 ", beschrijving='" + Beschrijving + '\'' +
                 ", prijs=" + prijs +
-                ", ovChipkaartNummers=" + ovChipkaartNummers +
+                ", ovChipkaartNummers=" + (ovChipkaartNummers.isEmpty() ? "Geen OVChipkaarten" : ovChipkaartNummers.toString()) +
                 '}';
     }
+
 
 }

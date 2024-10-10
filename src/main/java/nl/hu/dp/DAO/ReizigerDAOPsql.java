@@ -3,6 +3,7 @@ package nl.hu.dp.DAO;
 //import com.sun.jdi.connect.spi.Connection;
 import nl.hu.dp.MOD.Adres;
 import nl.hu.dp.MOD.OVChipkaart;
+import nl.hu.dp.MOD.Product;
 import nl.hu.dp.MOD.Reiziger;
 
 import java.sql.*;

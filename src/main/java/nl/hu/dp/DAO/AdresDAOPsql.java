@@ -106,7 +106,7 @@ public class AdresDAOPsql  implements AdresDAO{
         List<Adres> adressen = new ArrayList<>();
         try{
             PreparedStatement ps = conn.prepareStatement(query);
-            ResultSet rs = ps.executeQuery(query);
+            ResultSet rs = ps.executeQuery();
             while (rs.next()){
                 Adres adres = new Adres();
                 adres.setId(rs.getInt("adres_id"));
@@ -114,6 +114,11 @@ public class AdresDAOPsql  implements AdresDAO{
                 adres.setHuisnummer(rs.getString("huisnummer"));
                 adres.setStraat(rs.getString("straat"));
                 adres.setWoonplaats(rs.getString("woonplaats"));
+
+                int reizigerId = rs.getInt("reiziger_id");
+                Reiziger reiziger = new Reiziger();
+                reiziger.setId(reizigerId);
+                adres.setReiziger(reiziger);
 
                 adressen.add(adres);
             }

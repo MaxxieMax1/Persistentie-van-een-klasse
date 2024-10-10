@@ -82,6 +82,7 @@ public class Reiziger {
     }
 
 
+    @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("Reiziger {#").append(id).append(" ")
@@ -96,14 +97,15 @@ public class Reiziger {
         if (!OVChipkaart.isEmpty()) {
             sb.append(", OVChipkaarten: [");
             for (OVChipkaart ovChipkaart : OVChipkaart) {
-                sb.append(ovChipkaart).append(", ");
+                sb.append(ovChipkaart).append(", "); // Dit roept de toString van OVChipkaart aan
             }
             if (sb.length() > 0) {
-                sb.setLength(sb.length() - 2);
+                sb.setLength(sb.length() - 2); // Verwijder de laatste komma en spatie
             }
             sb.append("]");
         }
         sb.append("}");
         return sb.toString();
     }
+
 }
