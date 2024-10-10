@@ -67,6 +67,21 @@ public class Product {
         this.ovchipkaarten = ovchipkaarten;
     }
 
+    public void addOVChipkaart(OVChipkaart ovChipkaart) {
+        if (!this.ovchipkaarten.contains(ovChipkaart)) {
+            this.ovchipkaarten.add(ovChipkaart);
+            ovChipkaart.getProducten().add(this);  // Ensuring bidirectional relationship
+        }
+    }
+
+    // Method to remove an OVChipkaart
+    public void removeOVChipkaart(OVChipkaart ovChipkaart) {
+        if (this.ovchipkaarten.contains(ovChipkaart)) {
+            this.ovchipkaarten.remove(ovChipkaart);
+            ovChipkaart.getProducten().remove(this);  // Ensuring bidirectional relationship
+        }
+    }
+
     @Override
     public String toString() {
         return "Product{" +
@@ -74,6 +89,7 @@ public class Product {
                 ", naam='" + naam + '\'' +
                 ", beschrijving='" + beschrijving + '\'' +
                 ", prijs=" + prijs +
+                ", ovChipkaartNummers=" + ovchipkaarten +
                 '}';
     }
 }

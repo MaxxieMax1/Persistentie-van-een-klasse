@@ -26,11 +26,7 @@ public class ProductDAOHibernate implements ProductDAO {
     @Override
     public boolean delete(Product product) throws SQLException {
         entityManager.getTransaction().begin();
-
-        Product managedProduct = entityManager.merge(product);
-        managedProduct.getOvchipkaarten().clear();
-
-        entityManager.remove(managedProduct);
+        entityManager.remove(entityManager.contains(product) ? product : entityManager.merge(product));
         entityManager.getTransaction().commit();
         return true;
     }

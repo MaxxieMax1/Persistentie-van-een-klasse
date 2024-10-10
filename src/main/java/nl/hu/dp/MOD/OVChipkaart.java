@@ -71,8 +71,48 @@ public class OVChipkaart {
     public List<Product> getProducten() {
         return producten;
     }
+
+    // Method to add a product
+    public void addProduct(Product product) {
+        if (!this.producten.contains(product)) {
+            this.producten.add(product);
+            product.getOvchipkaarten().add(this);
+        }
+    }
+
+    // Method to remove a product
+    public void removeProduct(Product product) {
+        if (this.producten.contains(product)) {
+            this.producten.remove(product);
+            product.getOvchipkaarten().remove(this);
+        }
+    }
     @Override
     public String toString() {
-        return "OVChipkaart {#" + kaart_nummer + " geldig tot: " + geldig_tot + ", klasse: " + klasse + ", saldo: €" + saldo + "}";
+        StringBuilder productInfo = new StringBuilder();
+
+        if (producten != null && !producten.isEmpty()) {
+            productInfo.append("[");
+            for (Product product : producten) {
+                productInfo.append(product.getProduct_nummer()).append(", ");
+            }
+            if (productInfo.length() > 1) {
+                productInfo.setLength(productInfo.length() - 2);
+            }
+            productInfo.append("]");
+        } else {
+            productInfo.append("Geen producten");
+        }
+
+        String reizigerInfo = (reiziger != null) ? "Reiziger ID: " + reiziger.getId() : "Geen reiziger gekoppeld";
+
+        return "OVChipkaart{" +
+                "kaart_nummer=" + kaart_nummer +
+                ", geldig_tot=" + geldig_tot +
+                ", klasse=" + klasse +
+                ", saldo=" + saldo +
+                ", Product nummer=" + productInfo.toString() +
+                ", " + reizigerInfo +
+                '}';
     }
 }

@@ -31,11 +31,6 @@ public class OVChipkaartDAOHibernate implements OVChipkaartDAO {
         entityManager.persist(ovChipkaart);
         entityManager.getTransaction().commit();
 
-        if (this.productDAO != null) {
-            for (Product product : ovChipkaart.getProducten()) {
-                this.productDAO.save(product);
-            }
-        }
         return true;
     }
 
@@ -45,23 +40,15 @@ public class OVChipkaartDAOHibernate implements OVChipkaartDAO {
         entityManager.merge(ovChipkaart);
         entityManager.getTransaction().commit();
 
-        if (this.productDAO != null) {
-            for (Product product : ovChipkaart.getProducten()) {
-                this.productDAO.update(product);
-            }
-        }
         return true;
     }
 
     @Override
     public boolean delete(OVChipkaart ovChipkaart) {
         entityManager.getTransaction().begin();
-
-        OVChipkaart managedOvChipkaart = entityManager.merge(ovChipkaart);
-        managedOvChipkaart.getProducten().clear();
-
-        entityManager.remove(managedOvChipkaart);
+        entityManager.remove(ovChipkaart);
         entityManager.getTransaction().commit();
+
         return true;
     }
 

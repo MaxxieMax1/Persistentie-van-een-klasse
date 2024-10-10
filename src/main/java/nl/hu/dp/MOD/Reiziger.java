@@ -109,7 +109,9 @@ public class Reiziger {
             for (OVChipkaart ovChipkaart : OVChipkaart) {
                 sb.append(ovChipkaart).append(", ");
             }
-            sb.setLength(sb.length() - 2);
+            if (sb.length() > 0) {
+                sb.setLength(sb.length() - 2);
+            }
             sb.append("]");
         }
         sb.append("}");

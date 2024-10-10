@@ -81,6 +81,7 @@ public class Adres {
                 ", huisnummer='" + huisnummer + '\'' +
                 ", straat='" + straat + '\'' +
                 ", woonplaats='" + woonplaats + '\'' +
+                (reiziger != null ? ", reiziger_id=" + reiziger.getId() : "") +
                 '}';
     }
 }
