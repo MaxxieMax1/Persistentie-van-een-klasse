@@ -64,8 +64,12 @@ public class OVChipkaart {
     }
 
     public boolean addProduct(Product product) {
-        if (!producten.contains(product)) {
-            producten.add(product);
+        if (!this.producten.contains(product)) {
+            this.producten.add(product);
+            int kaartnummer = this.getKaart_nummer();
+            if (product.getOvchipkaarten().contains(kaartnummer)) {
+                product.getOvchipkaarten().add(kaartnummer);
+            }
             product.addOVChipkaart(this.kaart_nummer);
             return true;
         }
@@ -73,9 +77,10 @@ public class OVChipkaart {
     }
 
     public boolean removeProduct(Product product) {
-        if (producten.contains(product)) {
-            producten.remove(product);
-            product.removeOVChipkaart(this.kaart_nummer);
+        if (this.producten.contains(product)) {
+            this.producten.remove(product);
+            int kaartnummer = this.getKaart_nummer();
+            product.removeOVChipkaart(kaartnummer);
             return true;
         }
         return false;
@@ -83,14 +88,14 @@ public class OVChipkaart {
 
     @Override
     public String toString() {
-        StringBuilder productNamen = new StringBuilder();
+        StringBuilder productString = new StringBuilder();
         if (producten.isEmpty()) {
-            productNamen.append("Geen producten");
+            productString.append("Geen producten");
         } else {
             for (Product product : producten) {
-                productNamen.append(product.toString()).append(", ");
+                productString.append(product).append(", ");
             }
-            productNamen.setLength(productNamen.length() - 2);
+            productString.setLength(productString.length() - 2);
         }
 
 
@@ -99,7 +104,7 @@ public class OVChipkaart {
                 ", geldig_tot=" + geldig_tot +
                 ", klasse=" + klasse +
                 ", saldo=" + saldo +
-                ", producten=" + productNamen+
+                ", producten=" + productString+
                 ", reiziger_id=" + (reiziger != null ? reiziger.getId() : "Geen reiziger") +
                 '}';
     }

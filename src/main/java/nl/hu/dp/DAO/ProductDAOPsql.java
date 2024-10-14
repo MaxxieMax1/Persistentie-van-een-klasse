@@ -116,8 +116,7 @@ public class ProductDAOPsql implements ProductDAO {
                 product.setBeschrijving(rs.getString("beschrijving"));
                 product.setPrijs(rs.getDouble("prijs"));
 
-                OVChipkaart kaart = ovChipkaartDAO.findByKaartNummer(rs.getInt("kaart_nummer"));
-                product.addOVChipkaart(kaart.getKaart_nummer());
+                product.addOVChipkaart(ovChipkaart.getKaart_nummer());
 
                 products.add(product);
             }

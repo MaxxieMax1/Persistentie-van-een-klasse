@@ -22,6 +22,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
     public void setReizigerDAO(ReizigerDAO reizigerDAO) {
         this.reizigerDAO = reizigerDAO;
     }
+    public void setProductDAO(ProductDAO productDAO) {}
 
     @Override
     public boolean save(OVChipkaart ovChipkaart) throws SQLException {
@@ -110,62 +111,37 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
         return producten;
     }
 
-
-//    @Override
-//    public List<OVChipkaart> findAll() throws SQLException {
-//        List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
-//        String query = "SELECT * FROM ov_chipkaart";
-//
-//        try (PreparedStatement ps = conn.prepareStatement(query);
-//             ResultSet rs = ps.executeQuery()) {
-//
-//            while (rs.next()) {
-//                OVChipkaart ovChipkaart = new OVChipkaart();
-//                ovChipkaart.setKaart_nummer(rs.getInt("kaart_nummer"));
-//                ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
-//                ovChipkaart.setKlasse(rs.getInt("klasse"));
-//                ovChipkaart.setSaldo(rs.getDouble("saldo"));
-//
-//                Reiziger reiziger = reizigerDAO.findBy(rs.getInt("reiziger_id"));
-//                ovChipkaart.setReiziger(reiziger);
-//
-//                List<Product> producten = findProductsByOVChipkaart(ovChipkaart.getKaart_nummer());
-//                ovChipkaart.setProducten(producten);
-//
-//                alleOVChipkaarten.add(ovChipkaart);
-//            }
-//        } catch (SQLException e) {
-//            e.printStackTrace();
-//        }
-//
-//        return alleOVChipkaarten;
-//    }
-
     @Override
-    public List<OVChipkaart> findAll() throws SQLException {
-        List<OVChipkaart> alleOVChipkaarten = new ArrayList<>();
-        Set<Integer> kaartNummerSet = new HashSet<>();
+    public List<OVChipkaart> findAll() {
+        List<OVChipkaart> ovChipkaarten = new ArrayList<>();
+        String query = "SELECT * FROM ov_chipkaart";
 
-        List<Reiziger> alleReizigers = reizigerDAO.findAll();
+        try (PreparedStatement ps = conn.prepareStatement(query);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                OVChipkaart ovChipkaart = new OVChipkaart();
+                ovChipkaart.setKaart_nummer(rs.getInt("kaart_nummer"));
+                ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
+                ovChipkaart.setKlasse(rs.getInt("klasse"));
+                ovChipkaart.setSaldo(rs.getInt("saldo"));
 
-        for (Reiziger reiziger : alleReizigers) {
-            List<OVChipkaart> ovChipkaartenVoorReiziger = findByReiziger(reiziger);
+                Reiziger reiziger = reizigerDAO.findBy(rs.getInt("reiziger_id"));
+                ovChipkaart.setReiziger(reiziger);
 
-            for (OVChipkaart ovChipkaart : ovChipkaartenVoorReiziger) {
-                if (!kaartNummerSet.contains(ovChipkaart.getKaart_nummer())) {
-                    ovChipkaart.setReiziger(reiziger);
-
-                    List<Product> producten = findProductsByOVChipkaart(ovChipkaart.getKaart_nummer());
-                    ovChipkaart.setProducten(producten);
-
-                    alleOVChipkaarten.add(ovChipkaart);
-                    kaartNummerSet.add(ovChipkaart.getKaart_nummer());
+                List<Product> producten = findProductsByOVChipkaart(ovChipkaart.getKaart_nummer());
+                ovChipkaart.setProducten(producten);
+                for (Product product : producten) {
+                    ovChipkaart.addProduct(product);
+                    product.addOVChipkaart(ovChipkaart.getKaart_nummer());
                 }
+                ovChipkaarten.add(ovChipkaart);
             }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-
-        return alleOVChipkaarten;
+        return ovChipkaarten;
     }
+
 
 
 
@@ -176,24 +152,34 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
                 "LEFT JOIN ov_chipkaart_product opc ON oc.kaart_nummer = opc.kaart_nummer " +
                 "WHERE oc.reiziger_id = ?";
         List<OVChipkaart> ovChipkaarten = new ArrayList<>();
+        Set<Integer> kaartNummerSet = new HashSet<>();
 
         try (PreparedStatement ps = conn.prepareStatement(query)) {
             ps.setInt(1, reiziger.getId());
             ResultSet rs = ps.executeQuery();
 
             while (rs.next()) {
-                OVChipkaart ovChipkaart = new OVChipkaart();
-                ovChipkaart.setKaart_nummer(rs.getInt("kaart_nummer"));
-                ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
-                ovChipkaart.setKlasse(rs.getInt("klasse"));
-                ovChipkaart.setSaldo(rs.getDouble("saldo"));
+                int kaartNummer = rs.getInt("kaart_nummer");
 
-                ovChipkaart.setReiziger(reiziger);
+                if (!kaartNummerSet.contains(kaartNummer)) {
+                    OVChipkaart ovChipkaart = new OVChipkaart();
+                    ovChipkaart.setKaart_nummer(kaartNummer);
+                    ovChipkaart.setGeldig_tot(rs.getDate("geldig_tot"));
+                    ovChipkaart.setKlasse(rs.getInt("klasse"));
+                    ovChipkaart.setSaldo(rs.getDouble("saldo"));
+                    ovChipkaart.setReiziger(reiziger);
 
-                List<Product> producten = findProductsByOVChipkaart(ovChipkaart.getKaart_nummer());
-                ovChipkaart.setProducten(producten);
+                    List<Product> producten = findProductsByOVChipkaart(kaartNummer);
+                    ovChipkaart.setProducten(producten);
 
-                ovChipkaarten.add(ovChipkaart);
+                    for (Product product : producten) {
+                        ovChipkaart.addProduct(product);
+                        product.addOVChipkaart(kaartNummer);
+                    }
+
+                    ovChipkaarten.add(ovChipkaart);
+                    kaartNummerSet.add(kaartNummer);
+                }
             }
 
             rs.close();
@@ -203,6 +189,7 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
         return ovChipkaarten;
     }
+
 
     @Override
     public OVChipkaart findByKaartNummer(int kaartNummer) throws SQLException {
@@ -235,6 +222,11 @@ public class OVChipkaartDAOPsql implements OVChipkaartDAO{
 
                 List<Product> producten = findProductsByOVChipkaart(kaartNummer);
                 ovChipkaart.setProducten(producten);
+
+                for (Product product : producten) {
+                    ovChipkaart.addProduct(product);
+                    product.addOVChipkaart(kaartNummer);
+                }
             }
 
             rs.close();

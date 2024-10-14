@@ -14,14 +14,15 @@ import java.util.Scanner;
 public class Main {
     public static void main(String[] args) {
         try {
-            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5432/ovchipkaart", "postgres", "H0meW0rk");
+            Connection myConn = DriverManager.getConnection("jdbc:postgresql://localhost:5433/ovchipkaart", "postgres", "H0meW0rk");
             AdresDAOPsql adresDAOPsql = new AdresDAOPsql(myConn);
             OVChipkaartDAOPsql ovChipkaartDAOPsql = new OVChipkaartDAOPsql(myConn);
             ProductDAOPsql productDAOPsql = new ProductDAOPsql(myConn);
             ReizigerDAOPsql reizigerDAOPsql = new ReizigerDAOPsql(myConn, adresDAOPsql, ovChipkaartDAOPsql);
 
-            productDAOPsql.setOvChipkaartDAO(ovChipkaartDAOPsql);
+            ovChipkaartDAOPsql.setProductDAO(productDAOPsql);
             ovChipkaartDAOPsql.setReizigerDAO(reizigerDAOPsql);
+            productDAOPsql.setOvChipkaartDAO(ovChipkaartDAOPsql);
 
             // Scanner voor gebruikersinput
             Scanner scanner = new Scanner(System.in);
@@ -58,30 +59,46 @@ public class Main {
     }
 
     private static void bla(OVChipkaartDAO ovChipkaartDAO, ProductDAO productDAO, ReizigerDAO reizigerDAO, AdresDAO adresDAO) throws SQLException {
-        List<Product> products = productDAO.findAll();
-        for (Product product : products){
-            System.out.println(product);
-        }
-        Product p = new Product();
-        p.setNaam("STUDENTJEOV");
-        p.setBeschrijving("Dingetje voor studenten je weet wel");
-        p.setPrijs(19);
-        p.setProduct_nummer(999);
-        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(57401).getKaart_nummer());
-        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(79625).getKaart_nummer());
-        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(18326).getKaart_nummer());
-
+//        List<Product> products = productDAO.findAll();
+//        for (Product product : products){
+//            System.out.println(product);
+//        }
+//        Product p = new Product();
+//        p.setNaam("STUDENTJEOV");
+//        p.setBeschrijving("Dingetje voor studenten je weet wel");
+//        p.setPrijs(19);
+//        p.setProduct_nummer(999);
+//        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(57401).getKaart_nummer());
+//        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(79625).getKaart_nummer());
+//        p.addOVChipkaart(ovChipkaartDAO.findByKaartNummer(18326).getKaart_nummer());
+//
+////        productDAO.delete(p);
+//
+//        productDAO.save(p);
+//
+//        productDAO.update(p);
+//        System.out.println("-----------------------------");
+//        List<Product> products1 = productDAO.findAll();
+//        for (Product product : products1){
+//            System.out.println(product);
+//        }
 //        productDAO.delete(p);
+        List<OVChipkaart> ovChipkaarts = ovChipkaartDAO.findAll();
+        for (OVChipkaart ovChipkaart : ovChipkaarts) {
+            System.out.println(ovChipkaart);
+        }
 
-        productDAO.save(p);
+        System.out.println(ovChipkaartDAO.findByKaartNummer(68514));
 
-        productDAO.update(p);
-        System.out.println("-----------------------------");
-        List<Product> products1 = productDAO.findAll();
-        for (Product product : products1){
+        Reiziger i = reizigerDAO.findBy(2);
+        System.out.println(i);
+        System.out.println(ovChipkaartDAO.findByReiziger(i));
+        System.out.println();
+        List<Product> products = productDAO.findAll();
+        for (Product product : products) {
             System.out.println(product);
         }
-        productDAO.delete(p);
+
     }
 
     private static void testVeelOpVeel(OVChipkaartDAO ovChipkaartDAO, ProductDAO productDAO, ReizigerDAO reizigerDAO) throws SQLException {
